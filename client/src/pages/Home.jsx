@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
+import HeroBanner from '../components/HeroBanner';
 import './Home.css';
 
 function Home({ addToCart }) {
@@ -98,10 +99,7 @@ function Home({ addToCart }) {
 
   return (
     <div className="home">
-      <div className="hero">
-        <h2>Welcome to ARES</h2>
-        <p>Premium MMA Merchandise for Champions</p>
-      </div>
+      <HeroBanner />
 
       <div className="filters">
         {categories.map(category => (

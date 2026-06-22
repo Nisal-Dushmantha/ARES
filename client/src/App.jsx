@@ -7,16 +7,26 @@ import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
 import './App.css';
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     // Load cart from localStorage
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
+    }
+
+    // Load user from localStorage
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
   }, []);
 
@@ -61,13 +71,16 @@ function App() {
   return (
     <Router>
       <div className="app">
-        <Header cartCount={cartItems.length} />
+        <Header cartCount={cartItems.length} user={user} setUser={setUser} />
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home addToCart={addToCart} />} />
             <Route path="/product/:id" element={<ProductDetail addToCart={addToCart} />} />
             <Route path="/cart" element={<Cart cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />} />
             <Route path="/checkout" element={<Checkout cartItems={cartItems} />} />
+            <Route path="/login" element={<Login setUser={setUser} />} />
+            <Route path="/register" element={<Register setUser={setUser} />} />
+            <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
           </Routes>
         </main>
         <Footer />
