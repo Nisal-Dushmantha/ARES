@@ -5,27 +5,6 @@ import HeroBanner from '../components/HeroBanner';
 import './Home.css';
 
 function Home({ addToCart }) {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get('/api/products');
-      setProducts(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setLoading(false);
-      // Use placeholder data if backend not available
-      setProducts(getPlaceholderProducts());
-    }
-  };
-
   const getPlaceholderProducts = () => {
     return [
       {
@@ -91,6 +70,25 @@ function Home({ addToCart }) {
     ];
   };
 
+  const [products, setProducts] = useState(() => getPlaceholderProducts());
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('/api/products');
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setProducts(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      // Keep showing the instant placeholder catalog if the backend is slow or unavailable.
+    }
+  };
+
   const filteredProducts = selectedCategory === 'All' 
     ? products 
     : products.filter(p => p.category === selectedCategory);
@@ -113,23 +111,19 @@ function Home({ addToCart }) {
         ))}
       </div>
 
-      {loading ? (
-        <div className="loading">Loading products...</div>
-      ) : (
-        <div className="products-grid">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                onAddToCart={addToCart}
-              />
-            ))
-          ) : (
-            <p>No products found in this category.</p>
-          )}
-        </div>
-      )}
+      <div className="products-grid">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map(product => (
+            <ProductCard
+              key={product._id}
+              product={product}
+              onAddToCart={addToCart}
+            />
+          ))
+        ) : (
+          <p>No products found in this category.</p>
+        )}
+      </div>
     </div>
   );
 }
